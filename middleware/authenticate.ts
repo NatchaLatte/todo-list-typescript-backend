@@ -11,10 +11,13 @@ declare global {
 }
 
 export const authenticate = (req: Request, res: Response, next: NextFunction) => {
-  const token = req.headers.authorization;
+  const authorizationHeader = req.headers.authorization;
   try{
-    const decoded = jwt.verify(token as string, process.env.JWT_SECRET as string);
-    req.account = decoded;
+    if(authorizationHeader && authorizationHeader.startsWith("Bearer ")){
+      const token = authorizationHeader.split(" ")[1];
+      const decoded = jwt.verify(token as string, process.env.JWT_SECRET as string);
+      req.account = decoded;
+    }
     next();
   }catch (error){
     next();
